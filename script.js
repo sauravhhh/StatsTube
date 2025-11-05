@@ -1,5 +1,14 @@
-// Using the provided YouTube Data API v3 key
-const API_KEY = 'AIzaSyB9rW1GgcQlBBcZqL_xOJ_0m8jaH2DEFUs';
+// Multi-layer obfuscated API key
+// Note: This is obfuscation, NOT encryption. Determined users can still find it.
+const _0x4e2a = ['QUl6YVN5Qjly', 'VzFHZ2NRbEJC', 'Y1pxTF94T0pf', 'MG04amFIMkRF', 'RlVz'];
+const _k = () => {
+    let _t = '';
+    for(let i = 0; i < _0x4e2a.length; i++) {
+        _t += atob(_0x4e2a[i]);
+    }
+    return _t;
+};
+const API_KEY = _k();
 
 document.getElementById('fetchButton').addEventListener('click', fetchChannelData);
 document.getElementById('channelId').addEventListener('keypress', function(e) {
@@ -384,4 +393,4 @@ function showNotification(message) {
             document.body.removeChild(notification);
         }, 500);
     }, 3000);
-  }
+}
