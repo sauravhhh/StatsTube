@@ -10,6 +10,72 @@ const _k = () => {
 };
 const API_KEY = _k();
 
+// Theme toggle with persisted preference
+const themeToggle = document.getElementById('themeToggle');
+function syncThemeIcon() {
+    themeToggle.innerHTML = document.documentElement.classList.contains('dark')
+        ? '<i class="fas fa-sun"></i>'
+        : '<i class="fas fa-moon"></i>';
+}
+themeToggle.addEventListener('click', function() {
+    document.documentElement.classList.toggle('dark');
+    try {
+        localStorage.setItem('statstube-theme',
+            document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    } catch (e) {}
+    syncThemeIcon();
+});
+syncThemeIcon();
+
+// Recent searches (persisted, click to re-run)
+function getRecent() {
+    try {
+        return JSON.parse(localStorage.getItem('statstube-recent') || '[]');
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveRecent(term) {
+    if (!term) return;
+    let recent = getRecent().filter(t => t.toLowerCase() !== term.toLowerCase());
+    recent.unshift(term);
+    recent = recent.slice(0, 6);
+    try {
+        localStorage.setItem('statstube-recent', JSON.stringify(recent));
+    } catch (e) {}
+    renderRecent();
+}
+
+function renderRecent() {
+    const wrap = document.getElementById('recentSearches');
+    const chips = document.getElementById('recentChips');
+    const recent = getRecent();
+    chips.innerHTML = '';
+    if (!recent.length) {
+        wrap.style.display = 'none';
+        return;
+    }
+    wrap.style.display = 'block';
+    recent.forEach(term => {
+        const b = document.createElement('button');
+        b.className = 'recent-chip';
+        b.type = 'button';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-history';
+        b.appendChild(icon);
+        b.appendChild(document.createTextNode(' ' + term));
+        b.addEventListener('click', function() {
+            channelInput.value = term;
+            clearBtn.style.display = 'flex';
+            fetchChannelData();
+        });
+        chips.appendChild(b);
+    });
+}
+
+renderRecent();
+
 document.getElementById('fetchButton').addEventListener('click', fetchChannelData);
 document.getElementById('channelId').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
@@ -237,6 +303,25 @@ function displayChannelInfo(channel) {
     
     // Set channel ID
     channelIdDisplay.textContent = channel.id;
+
+    // Set channel banner (if available)
+    const banner = document.getElementById('channelBanner');
+    const bannerUrl = channel.brandingSettings && channel.brandingSettings.image &&
+        channel.brandingSettings.image.bannerExternalUrl;
+    if (bannerUrl) {
+        banner.style.backgroundImage = `url("${bannerUrl}")`;
+        banner.style.display = 'block';
+    } else {
+        banner.style.display = 'none';
+        banner.style.backgroundImage = 'none';
+    }
+
+    // Visit channel link
+    document.getElementById('visitChannelBtn').href =
+        `https://www.youtube.com/channel/${channel.id}`;
+
+    // Remember this search
+    saveRecent(inputField.value.trim());
     
     // Calculate and set advanced stats
     // Average views per video
@@ -318,7 +403,11 @@ function formatDate(date) {
 
 function showError(message) {
     const errorMessage = document.getElementById('errorMessage');
-    errorMessage.textContent = message;
+    errorMessage.innerHTML = '';
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-exclamation-circle';
+    errorMessage.appendChild(icon);
+    errorMessage.appendChild(document.createTextNode(' ' + message));
     errorMessage.style.display = 'block';
 }
 
