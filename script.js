@@ -265,14 +265,14 @@ function displayChannelInfo(channel) {
 
     // Milestone progress
     const msWrap = document.getElementById('milestoneWrap');
-    const ms = nextMilestone(subs);
+    const ms = nearestTarget(subs);
     if (ms) {
         msWrap.style.display = 'block';
         const pct = Math.min(100, (subs / ms) * 100);
         document.getElementById('milestoneLabel').innerHTML = '';
         const label = document.getElementById('milestoneLabel');
         const strong = document.createElement('strong');
-        strong.textContent = `${formatWhole(subs)} of ${formatWhole(ms)}`;
+        strong.textContent = `${formatNumber(subs)} of ${formatWhole(ms)}`;
         label.appendChild(strong);
         label.appendChild(document.createTextNode(` subscribers · ${formatWhole(ms - subs)} to go`));
         requestAnimationFrame(() => {
@@ -400,14 +400,14 @@ function fetchLatestVideos(channel) {
         .catch(error => console.error('Latest videos error:', error));
 }
 
-// ---------- Milestones ----------
-function nextMilestone(n) {
-    const steps = [1000, 10000, 50000, 100000, 500000, 1000000, 5000000,
-        10000000, 50000000, 100000000, 200000000, 500000000];
-    for (const s of steps) {
-        if (n < s) return s;
-    }
-    return null;
+// Nearest round-number target above the current count (e.g. 31.9M -> 32M)
+function nearestTarget(n) {
+    if (n <= 0) return 10;
+    const mag = Math.floor(Math.log10(n));
+    const factor = Math.pow(10, 1 - mag);
+    let target = Math.ceil(n * factor) / factor;
+    if (target <= n) target += 1 / factor;
+    return target;
 }
 
 // ---------- Formatters ----------
