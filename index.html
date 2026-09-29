@@ -10,141 +10,130 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css?v=2">
+    <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <i class="fab fa-youtube youtube-icon"></i>
-            <h1>StatsTube</h1>
+    <header class="sticky-head">
+        <div class="topbar">
+            <div class="brand">
+                <i class="fab fa-youtube"></i>
+                <span>StatsTube</span>
+            </div>
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
                 <i class="fas fa-moon"></i>
             </button>
         </div>
-
-        <div class="channel-input">
-            <div class="input-wrapper">
-                <div class="input-group">
-                    <input type="text" id="channelId" placeholder="Enter Channel ID, Username or URL">
-                    <button class="clear-btn" id="clearBtn"><i class="fas fa-times"></i></button>
-                    <button class="search-btn" id="fetchButton" aria-label="Search">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
+        <div class="search-row">
+            <div class="input-group">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="channelId" placeholder="Channel ID, @handle or URL" autocomplete="off">
+                <button class="clear-btn" id="clearBtn" aria-label="Clear"><i class="fas fa-times"></i></button>
+                <button class="go-btn" id="fetchButton">Go</button>
             </div>
-            <div class="input-hint">You can enter channel ID, username, or full YouTube channel URL</div>
-            <div class="recent-searches" id="recentSearches" style="display:none">
-                <div class="recent-label">Recent</div>
-                <div class="recent-chips" id="recentChips"></div>
-            </div>
-            <div class="error-message" id="errorMessage"></div>
         </div>
+    </header>
+
+    <main class="page">
+        <div class="recent-searches" id="recentSearches" style="display:none">
+            <div class="recent-label">Recent</div>
+            <div class="recent-chips" id="recentChips"></div>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
 
         <div class="loading" id="loading">
             <div class="loading-spinner"></div>
             <p>Fetching channel stats...</p>
         </div>
 
-        <div class="channel-info" id="channelInfo">
+        <div class="empty-state" id="emptyState">
+            <i class="fab fa-youtube"></i>
+            <p>Search any YouTube channel<br>to see its stats</p>
+        </div>
+
+        <section class="results" id="channelInfo">
             <div class="channel-banner" id="channelBanner"></div>
-            <div class="channel-header">
-                <div class="channel-avatar" id="channelAvatar">
-                    <!-- Avatar will be loaded here -->
-                </div>
-                <div class="channel-title">
+
+            <div class="id-row">
+                <div class="channel-avatar" id="channelAvatar"></div>
+                <div class="id-text">
                     <div class="channel-name" id="channelName"></div>
-                    <div class="channel-handle-container">
-                        <div class="channel-handle" id="channelHandle"></div>
-                        <div class="tooltip">
-                            <button class="copy-btn" id="copyHandleBtn" title="Copy username">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                            <span class="tooltiptext">Copy</span>
-                        </div>
+                    <div class="channel-handle-row">
+                        <span class="channel-handle" id="channelHandle"></span>
+                        <button class="copy-btn" id="copyHandleBtn" aria-label="Copy handle"><i class="fas fa-copy"></i></button>
                     </div>
                 </div>
-                <a class="visit-btn" id="visitChannelBtn" href="#" target="_blank" rel="noopener">
-                    <i class="fab fa-youtube"></i> Visit
+                <a class="visit-link" id="visitChannelBtn" href="#" target="_blank" rel="noopener">
+                    Visit <i class="fas fa-external-link-alt"></i>
                 </a>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon subs"><i class="fas fa-users"></i></div>
-                    <div class="stat-value" id="subscriberCount"></div>
+            <div class="stat-strip">
+                <div class="stat">
+                    <div class="stat-value" id="statSubs"></div>
                     <div class="stat-label">Subscribers</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon views"><i class="fas fa-eye"></i></div>
-                    <div class="stat-value" id="viewCount"></div>
-                    <div class="stat-label">Total Views</div>
+                <div class="stat">
+                    <div class="stat-value" id="statViews"></div>
+                    <div class="stat-label">Views</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon videos"><i class="fas fa-play-circle"></i></div>
-                    <div class="stat-value" id="videoCount"></div>
+                <div class="stat">
+                    <div class="stat-value" id="statVideos"></div>
                     <div class="stat-label">Videos</div>
                 </div>
             </div>
 
-            <div class="additional-info">
-                <div class="info-card">
-                    <div class="info-label">Country</div>
-                    <div class="info-value" id="channelCountry"></div>
+            <div class="milestone" id="milestoneWrap" style="display:none">
+                <div class="milestone-label" id="milestoneLabel"></div>
+                <div class="milestone-bar"><div class="milestone-fill" id="milestoneFill"></div></div>
+            </div>
+
+            <section class="block" id="latestSection" style="display:none">
+                <div class="block-head">
+                    <h2>Latest videos</h2>
+                    <a class="see-all" id="seeAllVideos" href="#" target="_blank" rel="noopener">View all</a>
                 </div>
-                <div class="info-card">
-                    <div class="info-label">Joined</div>
-                    <div class="info-value" id="channelJoined"></div>
-                </div>
-                <div class="info-card">
-                    <div class="info-label">Channel ID</div>
-                    <div class="info-value-container">
-                        <div class="info-value" id="channelIdDisplay"></div>
-                        <div class="tooltip">
-                            <button class="copy-btn" id="copyIdBtn" title="Copy channel ID">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                            <span class="tooltiptext">Copy</span>
-                        </div>
+                <div class="video-row" id="latestVideos"></div>
+            </section>
+
+            <section class="block">
+                <h2>Details</h2>
+                <div class="details">
+                    <div class="drow"><span class="dkey">Country</span><span class="dval" id="detailCountry"></span></div>
+                    <div class="drow"><span class="dkey">Joined</span><span class="dval" id="detailJoined"></span></div>
+                    <div class="drow"><span class="dkey">Channel age</span><span class="dval" id="detailAge"></span></div>
+                    <div class="drow"><span class="dkey">Avg views / video</span><span class="dval" id="detailAvgViews"></span></div>
+                    <div class="drow"><span class="dkey">Views / subscriber</span><span class="dval" id="detailViewsPerSub"></span></div>
+                    <div class="drow"><span class="dkey">Videos / month</span><span class="dval" id="detailVideosPerMonth"></span></div>
+                    <div class="drow">
+                        <span class="dkey">Channel ID</span>
+                        <span class="dval id-val"><span id="detailId"></span><button class="copy-btn" id="copyIdBtn" aria-label="Copy channel ID"><i class="fas fa-copy"></i></button></span>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="advanced-stats">
-                <div class="advanced-title">Advanced Analytics</div>
-                <div class="advanced-grid">
-                    <div class="advanced-card">
-                        <div class="advanced-label">Avg. Views per Video</div>
-                        <div class="advanced-value" id="avgViews"></div>
-                    </div>
-                    <div class="advanced-card">
-                        <div class="advanced-label">Channel Age</div>
-                        <div class="advanced-value" id="channelAge"></div>
-                    </div>
-                </div>
-            </div>
+            <section class="block" id="tagsBlock" style="display:none">
+                <h2>Keywords</h2>
+                <div class="tags" id="channelTags"></div>
+            </section>
 
-            <div class="tags-section">
-                <div class="advanced-title">Channel Keywords</div>
-                <div class="tags-container" id="channelTags">
-                    <!-- Tags will be loaded here -->
-                </div>
-            </div>
+            <section class="block" id="descBlock">
+                <h2>About</h2>
+                <p class="desc" id="channelDescription"></p>
+                <button class="text-btn" id="descToggle" style="display:none">Show more</button>
+            </section>
 
-            <div class="channel-description" id="channelDescription"></div>
-
-            <div class="share-section">
-                <button class="share-btn" id="shareBtn">
-                    <i class="fas fa-share-alt"></i>
-                    Share Stats
-                </button>
+            <div class="actions">
+                <button class="action-btn" id="shareBtn"><i class="fas fa-share-alt"></i> Share</button>
+                <button class="action-btn" id="copyStatsBtn"><i class="fas fa-clipboard"></i> Copy stats</button>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <footer>
         Made with <span class="heart">❤️</span> by Sauravhhh
     </footer>
 
-    <script src="script.js?v=2"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>
