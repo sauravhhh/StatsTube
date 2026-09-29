@@ -272,9 +272,9 @@ function displayChannelInfo(channel) {
         document.getElementById('milestoneLabel').innerHTML = '';
         const label = document.getElementById('milestoneLabel');
         const strong = document.createElement('strong');
-        strong.textContent = `${formatNumber(subs)} of ${formatNumber(ms)}`;
+        strong.textContent = `${formatWhole(subs)} of ${formatWhole(ms)}`;
         label.appendChild(strong);
-        label.appendChild(document.createTextNode(` subscribers · ${formatNumber(ms - subs)} to go`));
+        label.appendChild(document.createTextNode(` subscribers · ${formatWhole(ms - subs)} to go`));
         requestAnimationFrame(() => {
             document.getElementById('milestoneFill').style.width = pct + '%';
         });
@@ -424,6 +424,19 @@ function formatSubscriberCount(num) {
         indianFormat = num.toString();
     }
     return `${defaultFormat} (${indianFormat})`;
+}
+
+// Whole-number formatting for the milestone line (e.g. 32M, 18M)
+function formatWhole(num) {
+    if (num >= 1000000000) {
+        return Math.round(num / 1000000000) + 'B';
+    } else if (num >= 1000000) {
+        return Math.round(num / 1000000) + 'M';
+    } else if (num >= 1000) {
+        return Math.round(num / 1000) + 'K';
+    } else {
+        return Math.round(num).toString();
+    }
 }
 
 function formatNumber(num) {
